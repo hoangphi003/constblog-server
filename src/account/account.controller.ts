@@ -29,7 +29,7 @@ export class AccountController {
     } catch (error) {
       throw new HttpException(
         {
-          error: error.message || 'Create Fail',
+          error: error.message || 'Create Fails',
         },
         HttpStatus.BAD_GATEWAY,
         {
