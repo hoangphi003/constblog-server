@@ -1,72 +1,27 @@
 # For Pm2
 
-name: Deploy Production
-
-on:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Nodejs ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.12.0
-          cache: 'npm'
-      - name: Create .env file
-        run: echo "${{ secrets.ENV_PRODUCTION }}" > .env
-      - run: npm i
-      - run: npm run build
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Executing remote ssh commands using password
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.HOST_PRODUCTION }}
-          username: ${{ secrets.USERNAME_PRODUCTION }}
-          password: ${{ secrets.PASSWORD_PRODUCTION }}
-          port: ${{ secrets.PORT_PRODUCTION }}
-          script: |
-            export NVM_DIR=~/.nvm
-            source ~/.nvm/nvm.sh
-            cd ~/constblog-server
-            git fetch --all
-            git reset --hard origin/main
-            echo "${{ secrets.ENV_PRODUCTION }}" > .env
-            npm i
-            npm run build
-            pm2 restart constblog-server
-
-# For Docker
-
 # name: Deploy Production
 
 # on:
 #   push:
-#     branches: ["master"]
+#     branches: ['main']
 #   pull_request:
-#     branches: ["master"]
+#     branches: ['main']
 
 # jobs:
 #   build:
 #     runs-on: ubuntu-latest
 #     steps:
 #       - uses: actions/checkout@v4
+#       - name: Use Nodejs dollar symbol{{ matrix.node-version }}
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 20.12.0
+#           cache: 'npm'
 #       - name: Create .env file
 #         run: echo "dollar symbol{{ secrets.ENV_PRODUCTION }}" > .env
-#       - name: Build Docker Image
-#         run: docker build --platform linux/amd64 -t hoangphi03/constblog-client:v0 .
-#       - name: Login to DockerHub
-#         run: docker login -u dollar symbol{{ secrets.DOCKERHUB_USERNAME }} -p dollar symbol{{secrets.DOCKERHUB_PASSWORD}}
-#       - name: Push docker image
-#         run: docker push hoangphi03/constblog-client:v0
+#       - run: npm i
+#       - run: npm run build
 #   deploy:
 #     runs-on: ubuntu-latest
 #     needs: build
@@ -79,9 +34,54 @@ jobs:
 #           password: dollar symbol{{ secrets.PASSWORD_PRODUCTION }}
 #           port: dollar symbol{{ secrets.PORT_PRODUCTION }}
 #           script: |
-#             echo dollar symbol{{ secrets.PASSWORD_PRODUCTION }} | sudo -S sudo docker login -u dollar symbol{{ secrets.DOCKERHUB_USERNAME }} -p dollar symbol{{secrets.DOCKERHUB_PASSWORD}}
-#             echo dollar symbol{{ secrets.PASSWORD_PRODUCTION }} | sudo docker pull hoangphi03/constblog-client:v0
-#             echo dollar symbol{{ secrets.PASSWORD_PRODUCTION }} | sudo docker stop constblog-client
-#             echo dollar symbol{{ secrets.PASSWORD_PRODUCTION }} | sudo docker rm constblog-client
-#             echo dollar symbol{{ secrets.PASSWORD_PRODUCTION }} | sudo docker run -dp 3000:3000 --name constblog-client --restart unless-stopped hoangphi03/constblog-client:v0
-#             echo dollar symbol{{ secrets.PASSWORD_PRODUCTION }} | sudo docker image prune -f
+#             export NVM_DIR=~/.nvm
+#             source ~/.nvm/nvm.sh
+#             cd ~/constblog-server
+#             git fetch --all
+#             git reset --hard origin/main
+#             echo "dollar symbol{{ secrets.ENV_PRODUCTION }}" > .env
+#             npm i
+#             npm run build
+# pm2 restart constblog-server
+
+# For Docker
+
+name: Deploy Production
+
+on:
+  push:
+    branches: ['master']
+  pull_request:
+    branches: ['master']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_PRODUCTION }}" > .env
+      - name: Build Docker Image
+        run: docker build --platform linux/amd64 -t hoangphi03/constblog-server:v0 .
+      - name: Login to DockerHub
+        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{secrets.DOCKERHUB_PASSWORD}}
+      - name: Push docker image
+        run: docker push hoangphi03/constblog-server:v0
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOST_PRODUCTION }}
+          username: ${{ secrets.USERNAME_PRODUCTION }}
+          password: ${{ secrets.PASSWORD_PRODUCTION }}
+          port: ${{ secrets.PORT_PRODUCTION }}
+          script: |
+            echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo -S sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{secrets.DOCKERHUB_PASSWORD}}
+            echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo docker pull hoangphi03/constblog-server:v0
+            echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo docker stop constblog-server
+            echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo docker rm constblog-server
+            echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo docker run -dp 3000:3000 --name constblog-server --restart unless-stopped hoangphi03/constblog-server:v0
+            echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo docker image prune -f
