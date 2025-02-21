@@ -2,7 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'constblog-server',
-      script: 'npm run start',
+      script: 'npm',
+      args: 'run start:prod',
     },
   ],
 };
