@@ -83,5 +83,5 @@ jobs:
             echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo docker pull hoangphi03/constblog-server:v0
             echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo docker stop constblog-server
             echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo docker rm constblog-server
-            echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo docker run -dp 3000:3000 --name constblog-server --restart unless-stopped hoangphi03/constblog-server:v0
+            echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo docker run -dp 3030:3030 --name constblog-server --restart unless-stopped hoangphi03/constblog-server:v0
             echo ${{ secrets.PASSWORD_PRODUCTION }} | sudo docker image prune -f
