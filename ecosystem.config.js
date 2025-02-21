@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'Nestjs',
+      name: 'constblog-server',
       script: 'npm run start',
     },
   ],
